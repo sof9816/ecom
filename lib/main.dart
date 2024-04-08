@@ -5,7 +5,7 @@ import 'package:ecom/repositories/repo_client/repos_register.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  registerClient("https://dummyjson.com/");
+  registerClient("https://dummyjson.com");
   registerRepositories();
   runApp(const App());
 }

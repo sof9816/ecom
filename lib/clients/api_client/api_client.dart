@@ -59,7 +59,7 @@ class ApiClient {
     return responseJson;
   }
 
-  Future<Map<String, dynamic>> postReq(path, {params = const {}}) async {
+  Future<dynamic> postReq(path, {params = const {}}) async {
     Map<String, dynamic> responseJson;
     final url = (baseUrl + path).toUri();
     try {
@@ -75,9 +75,11 @@ class ApiClient {
   }
 
   Future<dynamic> _returnResponse(http.Response response) async {
-    Map<String, dynamic> responseJson =
-        json.decode(utf8.decode(response.bodyBytes));
-    var message = responseJson["message"] ?? "";
+    var responseJson = json.decode(response.body);
+    var message = "";
+    if (responseJson is Map && responseJson.containsKey("message")) {
+      message = responseJson["message"];
+    }
 
     isUserValid = true;
     switch (response.statusCode) {

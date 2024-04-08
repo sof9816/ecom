@@ -1,4 +1,5 @@
 import 'package:ecom/clients/api_client/api_client.dart';
+import 'package:ecom/models/user.dart';
 
 const String kLogin = "/auth/login";
 
@@ -6,7 +7,7 @@ class LoginApi {
   final ApiClient client;
   LoginApi(this.client);
 
-  Future<String> login({
+  Future<UserModel> login({
     required String username,
     required String password,
   }) async {
@@ -15,12 +16,12 @@ class LoginApi {
         Method.post,
         kLogin,
         params: {
-          "identifier": username,
+          "username": username,
           "password": password,
         },
       );
 
-      return response;
+      return UserModel.fromMap(response);
     } on Exception catch (_) {
       rethrow;
     }

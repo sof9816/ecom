@@ -1,3 +1,6 @@
+import 'package:ecom/blocs/login/bloc.dart';
+import 'package:ecom/repositories/repo_client/repos_register.dart';
+import 'package:ecom/repositories/user_repo.dart';
 import 'package:ecom/utils/loading_indicator.dart';
 import 'package:ecom/utils/snack_bar.dart';
 import 'package:flutter/material.dart';
@@ -16,9 +19,9 @@ class LoginScreen extends StatefulWidget {
 
 class LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
-  late AuthenticationBloc bloc;
+  late LoginBloc bloc;
 
-  late TextEditingController _phoneController;
+  late TextEditingController _usernameController;
   late TextEditingController _passwordController;
 
   @override
@@ -28,10 +31,12 @@ class LoginScreenState extends State<LoginScreen> {
 
   @override
   void initState() {
-    bloc = BlocProvider.of<AuthenticationBloc>(context);
-    _phoneController = TextEditingController();
+    bloc = LoginBloc(
+        repository: repo.get<UserRepo>(),
+        authenticationBloc: BlocProvider.of<AuthenticationBloc>(context));
+    _usernameController = TextEditingController();
     _passwordController = TextEditingController();
-    // _phoneController.text = "7716174742";
+    // _usernameController.text = "7716174742";
     // _passwordController.text = "12345678";
     super.initState();
   }
@@ -45,14 +50,14 @@ class LoginScreenState extends State<LoginScreen> {
           onTap: () {
             FocusScope.of(context).requestFocus(new FocusNode());
           },
-          child: BlocConsumer<AuthenticationBloc, AuthenticationState>(
+          child: BlocConsumer<LoginBloc, LoginState>(
             bloc: bloc,
             listener: (context, state) {
               // check if user has valid token or not
               if (!isUserValid && state is AuthenticationFailed) {
                 showSnackBar(context, "Wrong pass");
               }
-              if (state is AuthenticationFailed) {
+              if (state is LoginFailed) {
                 showSnackBar(context, state.error);
               }
               if (!isUserValid && state is AuthenticationUninitialized) {
@@ -88,7 +93,7 @@ class LoginScreenState extends State<LoginScreen> {
                               borderRadius: BorderRadius.circular(8),
                               child: Column(
                                 children: <Widget>[
-                                  _buildPhoneTextField(context),
+                                  _buildUsernameTextField(context),
                                   _buildPasswordTextField(context),
                                 ],
                               ),
@@ -125,7 +130,7 @@ class LoginScreenState extends State<LoginScreen> {
       hintText: placeholder,
       hintStyle: TextStyle(
         fontWeight: FontWeight.w500,
-        color: AppColor.shared.smokeWhite,
+        color: AppColor.shared.smokeWhite.withOpacity(0.5),
       ),
       hintTextDirection: TextDirection.ltr,
       errorStyle: const TextStyle(color: Colors.red, fontSize: 12),
@@ -153,15 +158,14 @@ class LoginScreenState extends State<LoginScreen> {
 
             if (_formKey.currentState != null) {
               if (_formKey.currentState!.validate()) {
-                String phone = _phoneController.text;
-                if (phone.startsWith("0")) {
-                  phone = phone.replaceFirst("0", "");
-                }
-                // bloc.add(DoLogin(phone, _passwordController.text));
+                String username = _usernameController.text;
+                String password = _passwordController.text;
+
+                bloc.add(DoLogin(username, password));
               }
             }
           },
-          child: (state is AuthenticationLoading)
+          child: (state is LoginLoading)
               ? const LoadingIndicator()
               : Text(
                   "Login",
@@ -175,7 +179,7 @@ class LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _buildPhoneTextField(BuildContext context) {
+  Widget _buildUsernameTextField(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.transparent,
@@ -185,10 +189,8 @@ class LoginScreenState extends State<LoginScreen> {
       margin: const EdgeInsets.fromLTRB(0, 0, 0, 10),
       child: TextFormField(
         validator: (value) {
-          if (value == null ||
-              (value.length < 10) ||
-              (value.startsWith("0") && value.length != 11)) {
-            return "User Not Valid";
+          if (value == null || value.isEmpty) {
+            return "Username Not Valid";
           }
           return null;
         },
@@ -196,12 +198,12 @@ class LoginScreenState extends State<LoginScreen> {
           fontSize: 16,
           color: AppColor.shared.smokeWhite,
         ),
-        keyboardType: TextInputType.phone,
+        keyboardType: TextInputType.name,
         enableSuggestions: false,
         autocorrect: false,
         textCapitalization: TextCapitalization.none,
         cursorColor: Theme.of(context).primaryColor,
-        controller: _phoneController,
+        controller: _usernameController,
         textDirection: TextDirection.ltr,
         decoration:
             commonInputDecoration(context, "Username", extraWidget: true),
@@ -221,6 +223,12 @@ class LoginScreenState extends State<LoginScreen> {
           fontSize: 16,
           color: AppColor.shared.smokeWhite,
         ),
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return "Password Not Valid";
+          }
+          return null;
+        },
         obscureText: true,
         keyboardType: TextInputType.visiblePassword,
         enableSuggestions: false,

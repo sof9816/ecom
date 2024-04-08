@@ -1,3 +1,4 @@
+import 'package:ecom/models/user.dart';
 import 'package:equatable/equatable.dart';
 
 abstract class AuthenticationEvent extends Equatable {
@@ -15,18 +16,8 @@ class AppStarted extends AuthenticationEvent {
   List<Object> get props => [this];
 }
 
-class DoLogin extends AuthenticationEvent {
-  final String username;
-  final String password;
-
-  const DoLogin(this.username, this.password);
-
-  @override
-  List<Object> get props => [username, password];
-}
-
 class LoggedIn extends AuthenticationEvent {
-  final String authentication;
+  final UserModel authentication;
 
   const LoggedIn({required this.authentication}) : super();
 

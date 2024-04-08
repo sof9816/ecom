@@ -15,10 +15,9 @@ class AuthenticationBloc
         emit(AuthenticationLoading());
         try {
           final bool hasToken = await repo.get<SessionManager>().hasToken();
-          if (hasToken) {
-            // TODO: yield
-            // final user = await userRepo.user();
-            emit(AuthenticationAuthenticated());
+          final user = await repo.get<SessionManager>().getAuthentication();
+          if (hasToken && user != null) {
+            emit(AuthenticationAuthenticated(user: user));
           } else {
             emit(AuthenticationUnauthenticated());
           }
@@ -26,29 +25,16 @@ class AuthenticationBloc
           emit(AuthenticationFailed());
         }
       }
-      if (event is DoLogin) {
-        emit(AuthenticationLoading());
-        try {
-          await userRepo.login(
-              username: event.username, password: event.password);
-          emit(AuthenticationAuthenticated());
-        } on Exception catch (_) {
-          emit(AuthenticationUninitialized());
-        }
-      }
+
       if (event is LoggedIn) {
         emit(AuthenticationLoading());
         await repo
             .get<SessionManager>()
-            .persistAuthentication(event.authentication);
+            .persistAuthentication(event.authentication.toJson());
         try {
-          // TODO: yield
-          // final user = await userRepo.user();
           final bool hasToken = await repo.get<SessionManager>().hasToken();
           if (hasToken) {
-            // TODO: yield
-            // final user = await userRepo.user();
-            emit(AuthenticationAuthenticated());
+            emit(AuthenticationAuthenticated(user: event.authentication));
           } else {
             emit(AuthenticationUnauthenticated());
           }

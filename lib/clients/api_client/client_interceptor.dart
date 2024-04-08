@@ -15,7 +15,7 @@ class ClientInterceptor implements InterceptorContract {
       final authentication =
           await repo.get<SessionManager>().getAuthentication();
       if (authentication != null) {
-        String token = authentication;
+        String token = authentication.token;
         headers[kAuthorizationHeader] = "Bearer $token";
       }
       data.headers = headers;

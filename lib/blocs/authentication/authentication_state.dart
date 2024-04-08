@@ -1,3 +1,4 @@
+import 'package:ecom/models/user.dart';
 import 'package:equatable/equatable.dart';
 
 abstract class AuthenticationState extends Equatable {
@@ -8,7 +9,8 @@ abstract class AuthenticationState extends Equatable {
 class AuthenticationUninitialized extends AuthenticationState {}
 
 class AuthenticationAuthenticated extends AuthenticationState {
-  AuthenticationAuthenticated();
+  final UserModel user;
+  AuthenticationAuthenticated({required this.user});
   @override
   List<Object> get props => [];
 }
@@ -21,8 +23,7 @@ class AuthenticationUnauthenticated extends AuthenticationState {
 class AuthenticationLoading extends AuthenticationState {}
 
 class AuthenticationFailed extends AuthenticationState {
-  final String? error;
-  AuthenticationFailed({this.error});
+  AuthenticationFailed();
   @override
   List<Object> get props => [AuthenticationFailed];
 }

@@ -1,6 +1,7 @@
 import 'package:ecom/blocs/authentication/bloc.dart';
 import 'package:ecom/repositories/user_repo.dart';
 import 'package:ecom/screens/auth/login_screen.dart';
+import 'package:ecom/screens/home/home_screen.dart';
 import 'package:ecom/utils/constants/app_color.dart';
 import 'package:ecom/utils/routers.dart';
 import 'package:ecom/utils/splash_screen.dart';
@@ -47,7 +48,7 @@ class AppState extends State<App> {
             bloc: BlocProvider.of<AuthenticationBloc>(context),
             builder: (context, state) {
               if (state is AuthenticationAuthenticated) {
-                // return HomeScreen();
+                return HomeScreen();
               }
 
               if (state is AuthenticationUnauthenticated) {

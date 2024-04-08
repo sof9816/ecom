@@ -1,5 +1,6 @@
 import 'package:ecom/clients/api_client/api_client.dart';
 import 'package:ecom/clients/login.dart';
+import 'package:ecom/models/user.dart';
 import 'package:ecom/repositories/repo_client/base_repo.dart';
 
 const kTokenField = "t";
@@ -10,7 +11,7 @@ class UserRepo extends BaseRepo {
     loginApi = LoginApi(client);
   }
 
-  Future<String> login({
+  Future<UserModel> login({
     required String username,
     required String password,
   }) async {
