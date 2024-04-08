@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:ecom/blocs/home/home_bloc.dart';
-import 'package:ecom/models/user.dart';
 import 'package:ecom/repositories/home_repo.dart';
+import 'package:ecom/screens/product/product_screen.dart';
 import 'package:ecom/utils/empty.dart';
 import 'package:ecom/utils/loading_indicator.dart';
 import 'package:flutter/material.dart';
@@ -35,8 +35,8 @@ class HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        color: AppColor.shared.grayColor,
+      backgroundColor: AppColor.shared.grayColor,
+      body: SafeArea(
         child: BlocConsumer<HomeBloc, HomeState>(
           bloc: widget.bloc,
           listener: (context, state) {
@@ -53,50 +53,57 @@ class HomeScreenState extends State<HomeScreen> {
             }
             if (state is ProductsLoaded) {
               var products = state.products;
-              return SafeArea(
-                child: Container(
-                  color: AppColor.shared.grayColor,
-                  child: RefreshIndicator(
-                    onRefresh: pullRefresh,
-                    child: Column(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
-                          height: 70,
-                          child: Row(
-                            children: [
-                              Text(
-                                "Hello ${state.user?.firstName ?? ""}",
-                                style: TextStyle(
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.w700,
-                                  color: AppColor.shared.greenColor,
-                                ),
+              return Container(
+                color: AppColor.shared.grayColor,
+                child: RefreshIndicator(
+                  onRefresh: pullRefresh,
+                  child: Column(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+                        height: 70,
+                        child: Row(
+                          children: [
+                            Text(
+                              "Hello ${state.user?.firstName ?? ""}",
+                              style: TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.w700,
+                                color: AppColor.shared.greenColor,
                               ),
-                              Expanded(child: SizedBox()),
-                              Container(
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(24),
-                                  color: AppColor.shared.smokeWhite,
-                                ),
-                                clipBehavior: Clip.hardEdge,
-                                child: Image.network(
-                                  state.user?.image ?? "",
-                                  width: 48,
-                                  height: 48,
-                                  fit: BoxFit.cover,
-                                ),
+                            ),
+                            Expanded(child: SizedBox()),
+                            Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(24),
+                                color: AppColor.shared.smokeWhite,
                               ),
-                            ],
-                          ),
+                              clipBehavior: Clip.hardEdge,
+                              child: Image.network(
+                                state.user?.image ?? "",
+                                width: 48,
+                                height: 48,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          ],
                         ),
-                        Expanded(
-                          child: ListView.builder(
-                            itemCount: products.length,
-                            padding: const EdgeInsets.fromLTRB(6, 0, 6, 10),
-                            itemBuilder: ((context, index) {
-                              var product = products[index];
-                              return Container(
+                      ),
+                      Expanded(
+                        child: ListView.builder(
+                          itemCount: products.length,
+                          padding: const EdgeInsets.fromLTRB(6, 0, 6, 10),
+                          itemBuilder: ((context, index) {
+                            var product = products[index];
+                            return GestureDetector(
+                              onTap: () {
+                                Navigator.pushNamed(
+                                  context,
+                                  ProductScreen.route,
+                                  arguments: product,
+                                );
+                              },
+                              child: Container(
                                 height: 140,
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(20),
@@ -210,12 +217,12 @@ class HomeScreenState extends State<HomeScreen> {
                                     ),
                                   ],
                                 ),
-                              );
-                            }),
-                          ),
+                              ),
+                            );
+                          }),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               );
